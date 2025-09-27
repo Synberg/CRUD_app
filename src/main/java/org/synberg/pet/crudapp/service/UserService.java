@@ -6,6 +6,7 @@ import org.synberg.pet.crudapp.dto.create.UserCreateDto;
 import org.synberg.pet.crudapp.dto.UserDto;
 import org.synberg.pet.crudapp.dto.update.UserUpdateDto;
 import org.synberg.pet.crudapp.entity.User;
+import org.synberg.pet.crudapp.exception.AlreadyExistsException;
 import org.synberg.pet.crudapp.exception.NotFoundException;
 import org.synberg.pet.crudapp.repository.UserRepository;
 
@@ -49,7 +50,7 @@ public class UserService {
      */
     public UserDto create(UserCreateDto userCreateDto) {
         if (userRepository.existsByEmail(userCreateDto.email())) {
-            throw new RuntimeException("Email already exists");
+            throw new AlreadyExistsException("Email already exists");
         }
         User user = new User();
         user.setName(userCreateDto.name());

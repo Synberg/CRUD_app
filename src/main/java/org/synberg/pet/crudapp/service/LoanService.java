@@ -8,6 +8,7 @@ import org.synberg.pet.crudapp.dto.update.LoanUpdateDto;
 import org.synberg.pet.crudapp.entity.Book;
 import org.synberg.pet.crudapp.entity.Loan;
 import org.synberg.pet.crudapp.entity.User;
+import org.synberg.pet.crudapp.exception.AlreadyExistsException;
 import org.synberg.pet.crudapp.exception.NotFoundException;
 import org.synberg.pet.crudapp.repository.BookRepository;
 import org.synberg.pet.crudapp.repository.LoanRepository;
@@ -96,7 +97,7 @@ public class LoanService {
                 .orElseThrow(() -> new NotFoundException("Book not found"));
 
         if (loanRepository.existsByBookAndReturnDateIsNull(book)) {
-            throw new RuntimeException("Book is already loaned");
+            throw new AlreadyExistsException("Book is already loaned");
         }
 
         Loan loan = new Loan();
@@ -128,23 +129,20 @@ public class LoanService {
     public LoanDto update(Long id, LoanUpdateDto loanUpdateDto) {
         Loan loan = loanRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Loan not found"));
-        if (loanUpdateDto.userId() != null) {
-            User user = userRepository.findById(loanUpdateDto.userId())
-                    .orElseThrow(() -> new NotFoundException("User not found"));
-            loan.setUser(user);
-        }
-        if (loanUpdateDto.bookId() != null) {
-            Book book = bookRepository.findById(loanUpdateDto.bookId())
-                    .orElseThrow(() -> new NotFoundException("Book not found"));
-            loan.setBook(book);
-        }
-        if (loanUpdateDto.loanDate() != null) {
-            loan.setLoanDate(loanUpdateDto.loanDate());
-        }
-        if (loanUpdateDto.returnDate() != null) {
-            loan.setReturnDate(loanUpdateDto.returnDate());
-        }
+
+        User user = userRepository.findById(loanUpdateDto.userId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        loan.setUser(user);
+
+        Book book = bookRepository.findById(loanUpdateDto.bookId())
+                .orElseThrow(() -> new NotFoundException("Book not found"));
+        loan.setBook(book);
+
+        loan.setLoanDate(loanUpdateDto.loanDate());
+        loan.setReturnDate(loanUpdateDto.returnDate());
+
         Loan savedLoan = loanRepository.save(loan);
+
         return new LoanDto(
                 savedLoan.getId(),
                 new UserDto(

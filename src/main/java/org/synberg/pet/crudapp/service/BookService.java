@@ -6,6 +6,7 @@ import org.synberg.pet.crudapp.dto.create.BookCreateDto;
 import org.synberg.pet.crudapp.dto.BookDto;
 import org.synberg.pet.crudapp.dto.update.BookUpdateDto;
 import org.synberg.pet.crudapp.entity.Book;
+import org.synberg.pet.crudapp.exception.AlreadyExistsException;
 import org.synberg.pet.crudapp.exception.NotFoundException;
 import org.synberg.pet.crudapp.repository.BookRepository;
 
@@ -53,6 +54,9 @@ public class BookService {
      * @return созданная книга в виде {@link BookDto}
      */
     public BookDto create(BookCreateDto bookCreateDto) {
+        if (bookRepository.existsByTitleAndAuthor(bookCreateDto.title(), bookCreateDto.author())) {
+            throw new AlreadyExistsException("Book already exists");
+        }
         Book book = new Book();
         book.setTitle(bookCreateDto.title());
         book.setAuthor(bookCreateDto.author());

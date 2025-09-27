@@ -27,5 +27,13 @@ public class GlobalExceptionHandler {
         error.put("message", ex.getMessage());
         return ResponseEntity.status(404).body(error);
     }
+
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleAlreadyExistsException(
+            AlreadyExistsException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getMessage());
+        return ResponseEntity.status(400).body(error);
+    }
 }
 
